@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.4/css/bulma.min.css" integrity="sha512-HqxHUkJM0SYcbvxUw5P60SzdOTy/QVwA1JJrvaXJv4q7lmbDZCmZaqz01UPOaQveoxfYRv1tHozWGPMcuTBuvQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+  </head>
+  <body>
+
+    <div class="container">
+      <section>
+        <div class="hero-body">
+          <h1 class="title">Bebthebarbariengineer's <a href="https://twitter.com/hashtag/Bricktuber">#Bricktuber</a> Builds</h1>
+
+          <p>An unofficial fansite for <a href="https://twitter.com/barbariengineer">Beb</a> the Barbarian Engineer VTuber who streams on <a href="https://twitch.tv/bebthebarbariengineer">Twitch</a>.</p>
+          <p>Since 2021, he has created many of his fellow VTubers out of LEGO.</p>
+          <p class="mt-5"><i>This is an exhaustive list of all <span class="count">{{ spreadsheet.values.length-1 }}</span> Bricktubers Beb has created and documented.</p>
+
+        </div>
+      </section>
+    
+      
+      <section>
+        <div class="content">
+
+          <div class="columns is-multiline is-mobile">
+
+            {% for bricktuber in spreadsheet.values.slice(1) |reverse %}
+              {% set bebNumber = bricktuber[0] %}
+              {% set date = bricktuber[1] %}
+              {% set vtuberName = bricktuber[2] %}
+              {% set vtuberTwitter = bricktuber[3] %}
+              {% set image1 = bricktuber[4] %}
+              {% set image2 = bricktuber[5] %}
+              {% set image3 = bricktuber[6] %}
+              {% set image4 = bricktuber[7] %}
+              {% set presentationTweet = bricktuber[8] %}
+              {% set instructions = bricktuber[9] %}
+
+              <div class="column is-half-mobile is-one-third-tablet is-one-fifth-desktop">
+                <div class="card">
+                  <div class="card-image">
+                    {% getFigureHtml image1, vtuberName %}
+                  </div>
+                  <div class="card-content">
+                    <div class="media-content">
+                      <p class="title is-4">{{ vtuberName }}</p>
+                      
+                      {% if vtuberTwitter %}
+                        <p class="subtitle is-6">
+                        <a href="{{ vtuberTwitter }}">@{{ vtuberTwitter|bname }}</a></p>
+                      {% endif %}
+
+                      <a href="{{ presentationTweet }}">{{ date }}</a>
+                    </div>
+                    
+                  </div>
+                </div>
+              </div>
+            {% else %}
+              <div class="column">
+                <p><i>There are no bricktubers.</i></p>
+              </div>
+            {% endfor %}
+            
+
+
+          </div>
+        </div>
+      </section>
+    
+
+
+      <div class="footer">
+        <p>Made with ❤️ by <a href="https://twitter.com/cj_clippy">CJ_Clippy</a></p>
+        <p>Data is rendered from <a href="https://docs.google.com/spreadsheets/d/1ChEgFmSQ7LnyHkHGX0WDXE7v1vuWLJ2TkveZf0FtISI">this google sheet</a>
+      </div>
+    </div>
+
+  </body>
+</html>
