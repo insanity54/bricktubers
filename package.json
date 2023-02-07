@@ -1,6 +1,6 @@
 {
   "name": "bricktubers-11ty",
-  "packageManager": "yarn@3.4.1",
+  "packageManager": "yarn@1.22.19",
   "dependencies": {
     "@11ty/eleventy": "^1.0.2",
     "@11ty/eleventy-fetch": "^3.0.0",
@@ -9,5 +9,8 @@
   },
   "devDependencies": {
     "netlify-plugin-cache": "^1.0.3"
+  },
+  "scripts": {
+    "build": "eleventy"
   }
 }
