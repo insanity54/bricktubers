@@ -8,3 +8,4 @@
 .cache/
 _site/
 src/img/gen/
+.env

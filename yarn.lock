@@ -573,6 +573,7 @@ __metadata:
     "@11ty/eleventy": ^1.0.2
     "@11ty/eleventy-fetch": ^3.0.0
     "@11ty/eleventy-img": ^3.0.0
+    dotenv: ^16.0.3
     netlify-plugin-cache: ^1.0.3
   languageName: unknown
   linkType: soft
@@ -1067,6 +1068,13 @@ __metadata:
   version: 1.1.0
   resolution: "doctypes@npm:1.1.0"
   checksum: 6e6c2d1a80f2072dc4831994c914c44455e341c5ab18c16797368a0afd59d7c22f3335805ba2c1dd2931e9539d1ba8b613b7650dc63f6ab56b77b8d888055de8
+  languageName: node
+  linkType: hard
+
+"dotenv@npm:^16.0.3":
+  version: 16.0.3
+  resolution: "dotenv@npm:16.0.3"
+  checksum: afcf03f373d7a6d62c7e9afea6328e62851d627a4e73f2e12d0a8deae1cd375892004f3021883f8aec85932cd2834b091f568ced92b4774625b321db83b827f8
   languageName: node
   linkType: hard
 
