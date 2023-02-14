@@ -1,0 +1,7 @@
+{% set navPages = collections.all | eleventyNavigation %}
+
+<nav class="navbar mt-3">
+{%- for nav in navPages %}
+  <a class="navbar-item" href="{{ nav.url }}">{{ nav.title }}</a>
+{%- endfor %}
+</nav>

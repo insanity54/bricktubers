@@ -1,0 +1,29 @@
+{% block start %}
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.4/css/bulma.min.css" integrity="sha512-HqxHUkJM0SYcbvxUw5P60SzdOTy/QVwA1JJrvaXJv4q7lmbDZCmZaqz01UPOaQveoxfYRv1tHozWGPMcuTBuvQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/bulma-prefers-dark" />
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+  </head>
+  <body>
+
+
+
+    <div class="container">
+
+      {% block content %}
+        {{ content | safe }}
+      {% endblock %}
+
+      <div class="footer">
+        <p>Made with ❤️ by <a target="_blank" href="https://cjclippy.carrd.co/">CJ_Clippy</a></p>
+        <p><a target="_blank" href="https://docs.google.com/spreadsheets/d/1ChEgFmSQ7LnyHkHGX0WDXE7v1vuWLJ2TkveZf0FtISI">Bricktuber Spreadsheet</a>
+        <p><a target="_blank" href="https://docs.google.com/spreadsheets/d/1ChEgFmSQ7LnyHkHGX0WDXE7v1vuWLJ2TkveZf0FtISI">Xenobricks Spreadsheet</a>
+      </div>
+    </div>
+
+  </body>
+</html>
+{% endblock %}

@@ -1,89 +1,58 @@
-<!DOCTYPE html>
-<html>
+---
+layout: base.njk
+eleventyNavigation:
+  key: Home
+  title: Beb's Builds
+  order: 1
+---
 
-  <head>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.4/css/bulma.min.css" integrity="sha512-HqxHUkJM0SYcbvxUw5P60SzdOTy/QVwA1JJrvaXJv4q7lmbDZCmZaqz01UPOaQveoxfYRv1tHozWGPMcuTBuvQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" type="text/css" href="https://unpkg.com/bulma-prefers-dark" />
-    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
-  </head>
-  <body>
+<section>
+  <div class="hero-body">
+    <h1 class="title">Beb's Builds</h1>
 
-    <div class="container">
-      <section>
-        <div class="hero-body">
-          <h1 class="title">Bebthebarbariengineer's <a target="_blank" href="https://twitter.com/hashtag/Bricktuber">#Bricktuber</a> Builds</h1>
+    <p>An unofficial fansite for <a target="_blank" href="https://twitter.com/barbariengineer">Beb</a> the Barbarian Engineer VTuber who streams on <a target="_blank" href="https://twitch.tv/bebthebarbariengineer">Twitch</a>.</p>
+    <p>Since 2021, he has created many characters out of LEGO.</p>
+    <p class="mt-5"><i>This is an exhaustive list of all <span class="count">{{ bricktubers.values.length-1 }}</span> Bricktubers and <span class="count">{{ xenobricks.values.length-1 }}</span> Xenobricks Beb has created and documented.</p>
 
-          <p>An unofficial fansite for <a target="_blank" href="https://twitter.com/barbariengineer">Beb</a> the Barbarian Engineer VTuber who streams on <a target="_blank" href="https://twitch.tv/bebthebarbariengineer">Twitch</a>.</p>
-          <p>Since 2021, he has created many of his fellow VTubers out of LEGO.</p>
-          <p class="mt-5"><i>This is an exhaustive list of all <span class="count">{{ spreadsheet.values.length-1 }}</span> Bricktubers Beb has created and documented.</p>
-
-        </div>
-      </section>
-    
-      
-      <section>
-        <div class="content">
-
-          <div class="columns is-multiline is-mobile">
-
-            {% for bricktuber in spreadsheet.values.slice(1) |reverse %}
-              {% set bebNumber = bricktuber[0] %}
-              {% set date = bricktuber[1] %}
-              {% set vtuberName = bricktuber[2] %}
-              {% set vtuberTwitter = bricktuber[3] %}
-              {% set image1 = bricktuber[4] %}
-              {% set image2 = bricktuber[5] %}
-              {% set image3 = bricktuber[6] %}
-              {% set image4 = bricktuber[7] %}
-              {% set presentationTweet = bricktuber[8] %}
-              {% set instructions = bricktuber[9] %}
-
-              <div class="column is-half-mobile is-one-third-tablet is-one-fifth-desktop">
-                <div class="card">
-                  <div class="card-image">
-                    {% getFigureHtml image1, vtuberName %}
-                  </div>
-                  <div class="card-content">
-                    <div class="media-content">
-                      <p class="title is-4">{{ vtuberName }}</p>
-                      
-                      {% if vtuberTwitter %}
-                        <p class="subtitle is-6">
-                        <a target="_blank" href="{{ vtuberTwitter }}">@{{ vtuberTwitter|bname }}</a></p>
-                      {% endif %}
-
-                      <div class="level">
-                        <a target="_blank" href="{{ presentationTweet }}">{{ date }}</a>
-
-                        {% if instructions %}
-                          <a target="_blank" href="{{ instructions }}">
-                            <ion-icon name="cloud-download-outline"></ion-icon>
-                          </a>
-                        {% endif %}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            {% else %}
-              <div class="column">
-                <p><i>There are no bricktubers.</i></p>
-              </div>
-            {% endfor %}
-            
+  </div>
+</section>
 
 
+<section>
+
+  <nav class="level">
+
+    <div class="level-item">
+      <a href="/bricktubers">
+        <div class="card">
+          <div class="card-image">
+            {% getFigureHtml 'https://pbs.twimg.com/media/E6rl7lWX0Ac22-z.jpg', "Bricktubers" %}
+          </div>
+          <div class="card-content">
+            <div class="media-content">
+              <p class="title is-4">Bricktubers</p>
+            </div>
           </div>
         </div>
-      </section>
-    
-
-
-      <div class="footer">
-        <p>Made with ❤️ by <a target="_blank" href="https://twitter.com/cj_clippy">CJ_Clippy</a></p>
-        <p>Data is rendered from <a target="_blank" href="https://docs.google.com/spreadsheets/d/1ChEgFmSQ7LnyHkHGX0WDXE7v1vuWLJ2TkveZf0FtISI">this google sheet</a>
-      </div>
+      </a>
     </div>
 
-  </body>
-</html>
+
+    <div class="level-item">  
+      <a href="/xenobricks">
+        <div class="card">
+          <div class="card-image">
+            {% getFigureHtml './src/img/xenobricks2.png', "Xenobricks" %}
+          </div>
+          <div class="card-content">
+            <div class="media-content">
+              <p class="title is-4">Xenobricks</p>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+  
+  </nav>
+</section>
+

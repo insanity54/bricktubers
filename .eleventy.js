@@ -1,12 +1,12 @@
 const Image = require("@11ty/eleventy-img");
+const eleventyNavigationPlugin = require("@11ty/eleventy-navigation");
 
 
 async function figureHtml(src, alt) {
   let stats = await Image(src, {
     widths: [64, 256, 512],
     formats: ["avif", "png"],
-    urlPath: "/img/gen/",
-    outputDir: "./src/img/gen/",
+    outputDir: "_site/img/",
     cacheOptions: {
       duration: '*'
     }
@@ -70,12 +70,12 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy({
       "./src/img/gen/*.png": "/img/gen"
   });
-
+  eleventyConfig.addPlugin(eleventyNavigationPlugin);
 
   return {
     dir: {
       data: "data",
-      includes: "partials",
+      includes: "includes",
       layouts: "layouts",
       input: "src"
     }
