@@ -1,11 +1,8 @@
 ---
 layout: base.njk
-eleventyNavigation:
-  key: Home
-  title: Beb's Builds
-  order: 1
----
 
+---
+{% include "nav.njk" %}
 <section>
   <div class="hero-body">
     <h1 class="title">Beb's Builds</h1>
@@ -42,7 +39,7 @@ eleventyNavigation:
       <a href="/xenobricks">
         <div class="card">
           <div class="card-image">
-            {% getFigureHtml './src/img/xenobricks2.png', "Xenobricks" %}
+            {% getFigureHtml './_src/img/xenobricks2.png', "Xenobricks" %}
           </div>
           <div class="card-content">
             <div class="media-content">

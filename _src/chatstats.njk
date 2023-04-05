@@ -1,0 +1,81 @@
+---
+layout: base.njk
+eleventyNavigation:
+  key: Chat Stats
+  order: 3
+---
+
+{% include "nav.njk" %}
+
+<section class="mb-5">
+  <div class="content">
+    <h3 class="heading">Chat Stats</h3>
+
+    <div id="chart"></div>
+
+  </div>
+</section>
+
+
+{# <script>
+{% include "../node_modules/uplot/dist/uPlot.iife.js" %}
+</script>
+
+
+<script>
+{% include "../node_modules/d3/dist/d3.min.js" %}
+</script> #}
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6"></script>
+<script src="/js/ntc.js"></script>
+
+<script>
+
+
+
+  d3.json('/js/colors.json').then(data => {
+
+
+    const colors = data.colors.reduce((acc, d) => {
+      if (d.color === '') return acc; // skip uncolored
+      const n_match = ntc.name(d.color);
+      const name = n_match[1];
+
+      const existingData = acc.find(x => x.date === d.date && x.color === d.color);
+      if (existingData) {
+        existingData.count++;
+      } else {
+        acc.push({
+          date: d.date,
+          color: d.color,
+          count: 1,
+          colorName: name
+        });
+      }
+
+      return acc;
+    }, []);
+      // color: {
+      //   legend: true,
+      //   domain: domain
+      // },
+    const domain = [...new Set(colors.map((c) => c.color))];
+    const plot = Plot.plot({
+      x: {
+        type: 'utc'
+      },
+      y: {
+        grid: true
+      },
+      marks: [,
+        Plot.ruleY([0]),
+        Plot.lineY(colors, {x: "date", y: "count", z: "color", stroke: "color", strokeWidth: 10, curve: 'bump-x'})
+      ]
+    })
+
+    document.querySelector('#chart').append(plot);
+  })
+  
+</script>
+

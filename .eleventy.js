@@ -2,9 +2,9 @@ const Image = require("@11ty/eleventy-img");
 const eleventyNavigationPlugin = require("@11ty/eleventy-navigation");
 
 
-async function figureHtml(src, alt) {
+async function figureHtml(src, alt, widths) {
   let stats = await Image(src, {
-    widths: [64, 256, 512],
+    widths: widths || [64, 256, 512],
     formats: ["avif", "png"],
     outputDir: "_site/img/",
     cacheOptions: {
@@ -20,6 +20,8 @@ async function figureHtml(src, alt) {
     loading: "lazy",
   });
 }
+
+
 
 
 module.exports = function (eleventyConfig) {
@@ -44,6 +46,7 @@ module.exports = function (eleventyConfig) {
     }
   );
 
+
   eleventyConfig.addNunjucksShortcode("bricktuber", function(name, twitter) {
     return `
       <div class="bricktuber">
@@ -62,22 +65,16 @@ module.exports = function (eleventyConfig) {
   });
 
   eleventyConfig.addNunjucksAsyncShortcode("getFigureHtml", figureHtml);
-
-
-  eleventyConfig.addPassthroughCopy({
-      "./src/img/gen/*.avif": "/img/gen"
-  });
-  eleventyConfig.addPassthroughCopy({
-      "./src/img/gen/*.png": "/img/gen"
-  });
   eleventyConfig.addPlugin(eleventyNavigationPlugin);
+  eleventyConfig.addPassthroughCopy({'./_src/_includes/js': '/js'})
+
 
   return {
     dir: {
-      data: "data",
-      includes: "includes",
-      layouts: "layouts",
-      input: "src"
+      data: "_data",
+      includes: "_includes",
+      layouts: "_layouts",
+      input: "_src"
     }
   }
 };
