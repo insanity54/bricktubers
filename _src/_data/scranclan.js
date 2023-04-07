@@ -1,6 +1,5 @@
 
 
-// require('dotenv').config()
 require('dotenv').config()
 const EleventyFetch = require("@11ty/eleventy-fetch");
 
@@ -13,7 +12,6 @@ module.exports = async function() {
     type: 'json'
   })
 
-  console.log(json)
 
   // Create an object to store the transformed data
   const transformedData = {
@@ -33,8 +31,6 @@ module.exports = async function() {
       });
     }
   }
-  console.log('transformed as follows')
-  console.log(transformedData)
 
   return {
     colors: transformedData.colors

@@ -13,69 +13,211 @@ eleventyNavigation:
 
     <div id="chart"></div>
 
+    <div id="my_dataviz"></div>
   </div>
 </section>
 
-
-{# <script>
-{% include "../node_modules/uplot/dist/uPlot.iife.js" %}
-</script>
-
+<script src="https://d3js.org/d3.v4.min.js"></script>
 
 <script>
-{% include "../node_modules/d3/dist/d3.min.js" %}
-</script> #}
-
-<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-<script src="https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6"></script>
-<script src="/js/ntc.js"></script>
-
-<script>
-
-
-
-  d3.json('/js/colors.json').then(data => {
-
-
-    const colors = data.colors.reduce((acc, d) => {
-      if (d.color === '') return acc; // skip uncolored
-      const n_match = ntc.name(d.color);
-      const name = n_match[1];
-
-      const existingData = acc.find(x => x.date === d.date && x.color === d.color);
-      if (existingData) {
-        existingData.count++;
-      } else {
-        acc.push({
-          date: d.date,
-          color: d.color,
-          count: 1,
-          colorName: name
-        });
-      }
-
-      return acc;
-    }, []);
-      // color: {
-      //   legend: true,
-      //   domain: domain
-      // },
-    const domain = [...new Set(colors.map((c) => c.color))];
-    const plot = Plot.plot({
-      x: {
-        type: 'utc'
-      },
-      y: {
-        grid: true
-      },
-      marks: [,
-        Plot.ruleY([0]),
-        Plot.lineY(colors, {x: "date", y: "count", z: "color", stroke: "color", strokeWidth: 10, curve: 'bump-x'})
-      ]
-    })
-
-    document.querySelector('#chart').append(plot);
-  })
+  // greets https://codepen.io/zakariachowdhury/pen/JEmjwq
+  // greets ChatGPT
   
+  d3.json('/js/colors.json', (err, fetchedData) => {
+    if (err) throw err
+    console.log(fetchedData)
+    // const filteredData = fetchedData.colors.filter((c) => c.color !== '')
+
+    const data = [];
+
+    // Create a map of objects with the year as the key
+    const map = new Map();
+    for (const color of fetchedData.colors) {
+      const year = new Date(color.date).getFullYear();
+      if (!map.has(year)) {
+        map.set(year, {});
+      }
+    }
+
+    // Add the color count for each year to the corresponding object in the map
+    for (const color of fetchedData.colors) {
+      const year = new Date(color.date).getFullYear();
+      const obj = map.get(year);
+      obj[color.color] = color.count;
+    }
+
+    // Create an array of objects in the desired format
+    for (const [year, obj] of map) {
+      const values = [];
+      for (const color in obj) {
+        if (color !== "") {
+          values.push({date: year.toString(), price: obj[color].toString()});
+        }
+      }
+      data.push({name: year.toString(), values});
+    }
+
+
+
+  var width = 500;
+  var height = 300;
+  var margin = 50;
+  var duration = 250;
+
+  var lineOpacity = "0.25";
+  var lineOpacityHover = "0.85";
+  var otherLinesOpacityHover = "0.1";
+  var lineStroke = "3px";
+  var lineStrokeHover = "4px";
+
+  var circleOpacity = '0.85';
+  var circleOpacityOnLineHover = "0.25"
+  var circleRadius = 3;
+  var circleRadiusHover = 6;
+
+
+  /* Format Data */
+  var parseDate = d3.timeParse("%Y");
+  data.forEach(function(d) { 
+    d.values.forEach(function(d) {
+      d.date = parseDate(d.date);
+      d.price = +d.price;    
+    });
+  });
+
+
+  /* Scale */
+  var xScale = d3.scaleTime()
+    .domain(d3.extent(data[0].values, d => d.date))
+    .range([0, width-margin]);
+
+  var yScale = d3.scaleLinear()
+    .domain([0, d3.max(data[0].values, d => d.price)])
+    .range([height-margin, 0]);
+
+  var color = d3.scaleOrdinal(d3.schemeCategory10);
+
+  /* Add SVG */
+  var svg = d3.select("#chart").append("svg")
+    .attr("width", (width+margin)+"px")
+    .attr("height", (height+margin)+"px")
+    .append('g')
+    .attr("transform", `translate(${margin}, ${margin})`);
+
+
+  /* Add line into SVG */
+  var line = d3.line()
+    .x(d => xScale(d.date))
+    .y(d => yScale(d.price));
+
+  let lines = svg.append('g')
+    .attr('class', 'lines');
+
+  lines.selectAll('.line-group')
+    .data(data).enter()
+    .append('g')
+    .attr('class', 'line-group')  
+    .on("mouseover", function(d, i) {
+        svg.append("text")
+          .attr("class", "title-text")
+          .style("fill", color(i))        
+          .text(d.name)
+          .attr("text-anchor", "middle")
+          .attr("x", (width-margin)/2)
+          .attr("y", 5);
+      })
+    .on("mouseout", function(d) {
+        svg.select(".title-text").remove();
+      })
+    .append('path')
+    .attr('class', 'line')  
+    .attr('d', d => line(d.values))
+    .style('stroke', (d, i) => color(i))
+    .style('opacity', lineOpacity)
+    .on("mouseover", function(d) {
+        d3.selectAll('.line')
+            .style('opacity', otherLinesOpacityHover);
+        d3.selectAll('.circle')
+            .style('opacity', circleOpacityOnLineHover);
+        d3.select(this)
+          .style('opacity', lineOpacityHover)
+          .style("stroke-width", lineStrokeHover)
+          .style("cursor", "pointer");
+      })
+    .on("mouseout", function(d) {
+        d3.selectAll(".line")
+            .style('opacity', lineOpacity);
+        d3.selectAll('.circle')
+            .style('opacity', circleOpacity);
+        d3.select(this)
+          .style("stroke-width", lineStroke)
+          .style("cursor", "none");
+      });
+
+
+  /* Add circles in the line */
+  lines.selectAll("circle-group")
+    .data(data).enter()
+    .append("g")
+    .style("fill", (d, i) => color(i))
+    .selectAll("circle")
+    .data(d => d.values).enter()
+    .append("g")
+    .attr("class", "circle")  
+    .on("mouseover", function(d) {
+        d3.select(this)     
+          .style("cursor", "pointer")
+          .append("text")
+          .attr("class", "text")
+          .text(`${d.price}`)
+          .attr("x", d => xScale(d.date) + 5)
+          .attr("y", d => yScale(d.price) - 10);
+      })
+    .on("mouseout", function(d) {
+        d3.select(this)
+          .style("cursor", "none")  
+          .transition()
+          .duration(duration)
+          .selectAll(".text").remove();
+      })
+    .append("circle")
+    .attr("cx", d => xScale(d.date))
+    .attr("cy", d => yScale(d.price))
+    .attr("r", circleRadius)
+    .style('opacity', circleOpacity)
+    .on("mouseover", function(d) {
+          d3.select(this)
+            .transition()
+            .duration(duration)
+            .attr("r", circleRadiusHover);
+        })
+      .on("mouseout", function(d) {
+          d3.select(this) 
+            .transition()
+            .duration(duration)
+            .attr("r", circleRadius);  
+        });
+
+
+  /* Add Axis into SVG */
+  var xAxis = d3.axisBottom(xScale).ticks(5);
+  var yAxis = d3.axisLeft(yScale).ticks(5);
+
+  svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", `translate(0, ${height-margin})`)
+    .call(xAxis);
+
+  svg.append("g")
+    .attr("class", "y axis")
+    .call(yAxis)
+    .append('text')
+    .attr("y", 15)
+    .attr("transform", "rotate(-90)")
+    .attr("fill", "#000")
+    .text("Count");
+  })
 </script>
 
+
+<script src="/js/ntc.js"></script>
