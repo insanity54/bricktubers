@@ -8,7 +8,7 @@ module.exports = async function() {
 
   console.log('  >> getting scranclan data')
   const json = await EleventyFetch(`http://scranclan.sbtp.xyz/api/colors.json?key=${process.env.SCRANCLAN_KEY}`, {
-    duration: '5m',
+    duration: '1m',
     type: 'json'
   })
 
@@ -25,7 +25,7 @@ module.exports = async function() {
       existingItem.count++;
     } else {
       transformedData.colors.push({
-        date: item.date,
+        date: new Date(item.date).toISOString().split('T')[0],
         color: item.color,
         count: 1
       });
