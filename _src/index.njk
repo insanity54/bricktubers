@@ -9,7 +9,7 @@ layout: base.njk
 
     <p>An unofficial fansite for <a target="_blank" href="https://twitter.com/barbariengineer">Beb</a> the Barbarian Engineer VTuber who streams on <a target="_blank" href="https://twitch.tv/bebthebarbariengineer">Twitch</a>.</p>
     <p>Since 2021, he has created many characters out of LEGO.</p>
-    <p class="mt-5"><i>This is an exhaustive list of all <span class="count">{{ bricktubers.values.length-1 }}</span> Bricktubers and <span class="count">{{ xenobricks.values.length-1 }}</span> Xenobricks Beb has created and documented.</p>
+    <p class="mt-5"><i>This is an exhaustive list of all <span class="count">{{ bricktubers.values.length-1 }}</span> Bricktubers, <span class="count">{{ xenobricks.values.length-1 }}</span> Xenobricks, and <span class="count">{{ fleshbricks.values.length-1 }}</span> Fleshbricks Beb has created and documented.</p>
 
   </div>
 </section>
@@ -17,9 +17,9 @@ layout: base.njk
 
 <section>
 
-  <nav class="level">
+  <div class="columns is-multiline">
 
-    <div class="level-item">
+    <div class="column is-half">
       <a href="/bricktubers">
         <div class="card">
           <div class="card-image">
@@ -35,11 +35,11 @@ layout: base.njk
     </div>
 
 
-    <div class="level-item">  
+    <div class="column is-half">  
       <a href="/xenobricks">
         <div class="card">
           <div class="card-image">
-            {% getFigureHtml './_src/img/xenobricks2.png', "Xenobricks" %}
+            {% getFigureHtml './_src/img/xenobricks.png', "Xenobricks" %}
           </div>
           <div class="card-content">
             <div class="media-content">
@@ -49,7 +49,23 @@ layout: base.njk
         </div>
       </a>
     </div>
+
+
+    <div class="column is-half">  
+      <a href="/fleshbricks">
+        <div class="card">
+          <div class="card-image">
+            {% getFigureHtml fleshbricks.values[1][4], "Fleshbricks" %}
+          </div>
+          <div class="card-content">
+            <div class="media-content">
+              <p class="title is-4">Fleshbricks</p>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
   
-  </nav>
+  </div>
 </section>
 

@@ -1,0 +1,72 @@
+---
+layout: base.njk
+eleventyNavigation:
+  key: Fleshbricks
+  order: 3
+---
+
+{% include "nav.njk" %}
+
+
+<section class="mb-5">
+  <div class="content">
+
+    <h3 class="heading">fleshbricks</h3>
+
+    <div class="columns is-multiline is-mobile">
+      {% for fleshbrick in fleshbricks.values.slice(1) |reverse %}
+        {% set bebNumber = fleshbrick[0] %}
+        {% set date = fleshbrick[1] %}
+        {% set name = fleshbrick[2] %}
+        {% set twitter = fleshbrick[3] %}
+        {% set image1 = fleshbrick[4] %}
+        {% set image2 = fleshbrick[5] %}
+        {% set image3 = fleshbrick[6] %}
+        {% set image4 = fleshbrick[7] %}
+        {% set presentationTweet = fleshbrick[8] %}
+        {% set instructions = fleshbrick[9] %}
+
+        {% if date and name and twitter and image1 and presentationTweet %}
+
+          <div class="column is-half-mobile is-one-third-tablet is-one-fifth-desktop">
+            <div class="card">
+              <div class="card-image">
+                {% getFigureHtml image1, name %}
+              </div>
+              <div class="card-content">
+                <div class="media-content">
+                  <p class="title is-4">{{ name }}</p>
+                  
+                  {% if twitter %}
+                    <p class="subtitle is-6">
+                    <a target="_blank" href="{{ twitter }}">@{{ twitter|bname }}</a></p>
+                  {% endif %}
+
+                  <div class="level">
+                    <a target="_blank" href="{{ presentationTweet }}">{{ date }}</a>
+
+                    {% if instructions %}
+                      <a target="_blank" href="{{ instructions }}">
+                        <ion-icon name="cloud-download-outline"></ion-icon>
+                      </a>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+
+      {% else %}
+        <div class="column">
+          <p><i>There are no fleshbricks.</i></p>
+        </div>
+      {% endfor %}
+      
+
+
+    </div>
+
+
+  </div>
+</section>

@@ -2,7 +2,7 @@
 layout: base.njk
 eleventyNavigation:
   key: Chat Stats
-  order: 3
+  order: 4
 ---
 
 {% include "nav.njk" %}
@@ -11,8 +11,11 @@ eleventyNavigation:
   <div class="content">
     <h3 class="heading">Chat Stats</h3>
 
-    <h4>Username colors</h4>
+    <p class="subtitle">#bebthebarbariengineer twitch chat statistics</p>
+
+    <h4>Username color popularity</h4>
     <div id="chart"></div>
+    <p><i>Total count over the past 90 days. Counted as the most recent chat message per person per day. Updates daily.</i></p>
 
   </div>
 </section>
@@ -20,48 +23,68 @@ eleventyNavigation:
 <script src="https://unpkg.com/d3@7.8.4/dist/d3.min.js"></script>
 
 <script>
-  // greets https://stackoverflow.com/a/71422140/1004931
-  d3.json('/js/colors.json').then((fetchedData) => {
 
-    const colors = fetchedData?.colors
+// set the dimensions and margins of the graph
+const margin = {top: 30, right: 30, bottom: 70, left: 60};
+const width = 460 - margin.left - margin.right;
+const height = 400 - margin.top - margin.bottom;
 
-    const width = 700,
-          height = 500;
+// append the svg object to the body of the page
+const svg = d3.select("#chart")
+  .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    const svg = d3.select("#chart").append("svg")
-      .attr("width", width)
-      .attr("height", height);
+// Parse the Data
+d3.json("/js/colors.json").then(function(fetchedData) {
 
-    const x = d3.scalePoint()
-      .domain(colors.map(d => d.date))
-      .range([30, width-30]);
-    svg.append("g")
-      .attr("transform", `translate(0, ${height-30})`)
-      .call(d3.axisBottom(x).ticks(5));
-    const y = d3.scaleLinear()
-      .domain([0, d3.max(colors, d => d.count)])
-      .range([height-30, 0]);
-    svg.append("g")
-      .attr("transform", `translate(30, 0)`)
-      .call(d3.axisLeft(y));
-        
-    const dataNest = Array.from(
-      d3.group(colors, d => d.color), ([key, value]) => ({ key, value })
-    );
-    const line = d3.line()
-      .x(d => x(d.date))
-      .y(d => y(d.count));
-    svg.selectAll("path.line")
-      .data(dataNest)
-      .join("path")
-        .attr("class", "line")
-        .attr("fill", "none")
-        .attr("stroke-width", '5px')
-        .style("stroke", d => d.key === '' ? 'black' : d.key)
-        .attr("d", d => line(d.value));
 
-      })
+const countByColor = d3.rollup(
+  fetchedData.colors, 
+  v => d3.sum(v, d => d.count), 
+  d => d.color
+)
+
+// convert Map to array of objects
+const countByColorArray = Array.from(countByColor, ([color, count]) => ({ color, count }));    
+
+
+// X axis
+const x = d3.scaleBand()
+  .range([ 0, width ])
+  .domain(countByColorArray.map(d => d.color))
+  .padding(0.2);
+svg.append("g")
+  .attr("transform", `translate(0, ${height})`)
+  .call(d3.axisBottom(x))
+  .selectAll("text")
+    .attr("transform", "translate(-10,0)rotate(-45)")
+    .style("text-anchor", "end");
+
+// Add Y axis
+const y = d3.scaleLinear()
+  .domain([0, d3.max(Array.from(countByColor.values()), d => d)])
+  .range([ height, 0]);
+svg.append("g")
+  .call(d3.axisLeft(y).tickFormat(d3.format(".0f")));
+
+
+
+// Bars
+svg.selectAll("mybar")
+  .data(countByColorArray)
+  .join("rect")
+    .attr("x", d => x(d.color))
+    .attr("y", d => y(d.count))
+    .attr("width", x.bandwidth())
+    .attr("height", d => height - y(d.count))
+    .attr("fill", d => d.color)
+
+})
 </script>
+
 
 
 <script src="/js/ntc.js"></script>

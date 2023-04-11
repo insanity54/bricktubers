@@ -18,6 +18,7 @@ module.exports = async function() {
     "colors": []
   }
 
+
   // Loop through the original data and create a frequency count for each color on each date
   for (const item of json.colors) {
     const existingItem = transformedData.colors.find(d => d.date === item.date && d.color === item.color);
@@ -33,6 +34,7 @@ module.exports = async function() {
   }
 
   return {
-    colors: transformedData.colors
+    colors: transformedData.colors,
+    samples: []
   }
 };
