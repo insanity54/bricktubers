@@ -26,7 +26,7 @@ eleventyNavigation:
         {% set presentationTweet = bricktuber[8] %}
         {% set instructions = bricktuber[9] %}
 
-        {% if date and vtuberName and vtuberTwitter and image1 and presentationTweet %}
+        {% if date and vtuberName and vtuberTwitter and image1 %}
 
           <div class="column is-half-mobile is-one-third-tablet is-one-fifth-desktop">
             <div class="card">
@@ -43,7 +43,8 @@ eleventyNavigation:
                   {% endif %}
 
                   <div class="level">
-                    <a target="_blank" href="{{ presentationTweet }}">{{ date }}</a>
+                    {% if presentationTweet %}<a target="_blank" href="{{ presentationTweet }}">{{ date }}</a>
+                    {% else %}<p>{{ date }}</p>{% endif %}
 
                     {% if instructions %}
                       <a target="_blank" href="{{ instructions }}">
