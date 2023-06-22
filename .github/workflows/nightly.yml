@@ -13,5 +13,4 @@ jobs:
         env: 
           URL: ${{ secrets.NETLIFY_NIGHTLY_HOOK_URL }}
         run: |
-          echo "the var is $env"
           curl -X POST -d '{}' $URL
