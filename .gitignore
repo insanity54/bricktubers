@@ -1,9 +1,7 @@
+_site
+
 # Created by https://www.toptal.com/developers/gitignore/api/node
 # Edit at https://www.toptal.com/developers/gitignore?templates=node
-
-
-
-_site/
 
 ### Node ###
 # Logs
@@ -146,4 +144,3 @@ dist
 .svelte-kit
 
 # End of https://www.toptal.com/developers/gitignore/api/node
-
