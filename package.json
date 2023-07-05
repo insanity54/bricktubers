@@ -16,5 +16,6 @@
   "scripts": {
     "build": "eleventy",
     "dev": "eleventy --serve"
-  }
+  },
+  "cacheDirectories": [".cache"]
 }
