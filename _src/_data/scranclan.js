@@ -7,7 +7,7 @@ const EleventyFetch = require("@11ty/eleventy-fetch");
 module.exports = async function() {
 
   console.log('  >> getting scranclan data')
-  const json = await EleventyFetch(`http://scranclan.sbtp.xyz/api/colors.json?key=${process.env.SCRANCLAN_KEY}`, {
+  const json = await EleventyFetch(`https://scranclan.grimtech.net/api/colors.json?key=${process.env.SCRANCLAN_KEY}`, {
     duration: '1m',
     type: 'json'
   })
