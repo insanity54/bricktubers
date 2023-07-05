@@ -17,5 +17,6 @@
     "build": "eleventy",
     "dev": "eleventy --serve"
   },
-  "cacheDirectories": [".cache"]
+  "cacheDirectories": [".cache"],
+  "license": "unlicense"
 }
