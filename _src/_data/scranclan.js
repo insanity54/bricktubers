@@ -2,12 +2,13 @@
 
 require('dotenv').config()
 const EleventyFetch = require("@11ty/eleventy-fetch");
-
+const scranclanUri = `https://scranclan.sbtp.xyz/api/colors.json?key=${process.env.SCRANCLAN_KEY}`
 
 module.exports = async function() {
 
-  console.log('  >> getting scranclan data')
-  const json = await EleventyFetch(`https://scranclan.grimtech.net/api/colors.json?key=${process.env.SCRANCLAN_KEY}`, {
+
+  console.log(`  >> getting scranclan data ${scranclanUri}`)
+  const json = await EleventyFetch(scranclanUri, {
     duration: '1m',
     type: 'json'
   })

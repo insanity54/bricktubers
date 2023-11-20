@@ -5,7 +5,7 @@ const eleventyNavigationPlugin = require("@11ty/eleventy-navigation");
 async function figureHtml(src, alt, widths) {
   let stats = await Image(src, {
     widths: widths || [64, 256, 512],
-    formats: ["avif", "png"],
+    formats: ["webp", "png"],
     outputDir: "_site/img/",
     cacheOptions: {
       duration: '*'

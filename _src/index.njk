@@ -1,15 +1,26 @@
 ---
 layout: base.njk
-
+eleventyNavigation:
+  key: Bricktubers
+  order: 1
 ---
 {% include "nav.njk" %}
 <section>
   <div class="hero-body">
     <h1 class="title">Beb's Builds</h1>
 
+    <div class="columns is-mobile">
+      <div class="column is-half">
+        {% getFigureHtml './_src/img/lego.svg', "LEGO", [256] %}
+      </div>
+      <div class="column is-half">
+        {% getFigureHtml './_src/img/beb2.jpg', "bebthebarbariengineer", [256] %}
+      </div>
+    </div>
+
     <p>An unofficial fansite for <a target="_blank" href="https://twitter.com/barbariengineer">Beb</a> the Barbarian Engineer VTuber who streams on <a target="_blank" href="https://twitch.tv/bebthebarbariengineer">Twitch</a>.</p>
-    <p>Since 2021, he has created many characters out of LEGO.</p>
-    <p class="mt-5"><i>This is an exhaustive list of all <span class="count">{{ bricktubers.values.length-1 }}</span> Bricktubers, <span class="count">{{ xenobricks.values.length-1 }}</span> Xenobricks, and <span class="count">{{ fleshbricks.values.length-1 }}</span> Fleshbricks Beb has created and documented.</p>
+    <p>Since 2021, he has created many characters and vtubers out of LEGO.</p>
+    <p class="mt-5"><i>This is an exhaustive list of all <span class="count">{{ bricktubers.values.length-1 }}</span> Bricktubers Beb has created and documented.</p>
 
   </div>
 </section>
@@ -17,55 +28,78 @@ layout: base.njk
 
 <section>
 
-  <div class="columns is-multiline">
+    <div class="columns is-multiline is-mobile">
+      {% for bricktuber in bricktubers.values.slice(1) |reverse %}
+        {% set bebNumber = bricktuber[0] %}
+        {% set date = bricktuber[1] %}
+        {% set vtuberName = bricktuber[2] %}
+        {% set vtuberTwitter = bricktuber[3] %}
+        {% set image1 = bricktuber[4] %}
+        {% set image2 = bricktuber[5] %}
+        {% set image3 = bricktuber[6] %}
+        {% set image4 = bricktuber[7] %}
+        {% set presentationTweet = bricktuber[8] %}
+        {% set instructions = bricktuber[9] %}
 
-    <div class="column is-half">
-      <a href="/bricktubers">
-        <div class="card">
-          <div class="card-image">
-            {% getFigureHtml 'https://pbs.twimg.com/media/E6rl7lWX0Ac22-z.jpg', "Bricktubers" %}
-          </div>
-          <div class="card-content">
-            <div class="media-content">
-              <p class="title is-4">Bricktubers</p>
+        {% if date and vtuberName and vtuberTwitter and image1 %}
+
+          <div class="column is-half-mobile is-one-third-tablet is-one-fifth-desktop">
+            <div class="card">
+              <div class="card-image">
+                {% getFigureHtml image1, vtuberName %}
+              </div>
+              <div class="card-content">
+                <div class="media-content">
+                  <p class="title is-4">{{ vtuberName }}</p>
+                  
+                  {% if vtuberTwitter %}
+                    <p class="subtitle is-6">
+                    <a target="_blank" href="{{ vtuberTwitter }}">@{{ vtuberTwitter|bname }}</a></p>
+                  {% endif %}
+
+                  <div class="level">
+                    {% if presentationTweet %}<a target="_blank" href="{{ presentationTweet }}">{{ date }}</a>
+                    {% else %}<p>{{ date }}</p>{% endif %}
+
+                    {% if instructions %}
+                      <a target="_blank" href="{{ instructions }}">
+                        <ion-icon name="cloud-download-outline"></ion-icon>
+                      </a>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </a>
-    </div>
-
-
-    <div class="column is-half">  
-      <a href="/xenobricks">
-        <div class="card">
-          <div class="card-image">
-            {% getFigureHtml './_src/img/xenobricks.png', "Xenobricks" %}
-          </div>
-          <div class="card-content">
-            <div class="media-content">
-              <p class="title is-4">Xenobricks</p>
+        {% else %}
+          <div class="column is-half-mobile is-one-third-tablet is-one-fifth-desktop">
+            <div class="card">
+              <div class="card-image">
+                {% getFigureHtml './_src/img/secret-bricktuber.png', 'secret bricktuber' %}
+              </div>
+              <div class="card-content">
+                <div class="media-content">
+                  <p class="title is-4 secret">SECRET</p>
+                  <p class="subtitle is-6">&nbsp;</p>
+                  <div class="level">
+                    <a>&nbsp;</a>
+                    <p>&nbsp;</p>
+                    <p>&nbsp;</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
+        {% endif %}
+
+      {% else %}
+        <div class="column">
+          <p><i>There are no bricktubers.</i></p>
         </div>
-      </a>
-    </div>
+      {% endfor %}
+      
 
 
-    <div class="column is-half">  
-      <a href="/fleshbricks">
-        <div class="card">
-          <div class="card-image">
-            {% getFigureHtml fleshbricks.values[1][4], "Fleshbricks" %}
-          </div>
-          <div class="card-content">
-            <div class="media-content">
-              <p class="title is-4">Fleshbricks</p>
-            </div>
-          </div>
-        </div>
-      </a>
     </div>
-  
-  </div>
 </section>
 
