@@ -52,7 +52,7 @@ eleventyNavigation:
                 <div class="media-content">
                   <p class="title is-4">{{ vtuberName }}</p>
                   
-                  {% if vtuberTwitter %}
+                  {% if vtuberTwitter and vtuberTwitter !== 'n/a' %}
                     <p class="subtitle is-6">
                     <a target="_blank" href="{{ vtuberTwitter }}">@{{ vtuberTwitter|bname }}</a></p>
                   {% endif %}
