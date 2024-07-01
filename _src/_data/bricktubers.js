@@ -1,6 +1,7 @@
 
 
-require('dotenv').config()
+const path = require('path')
+require('dotenv').config({ path: path.join(__dirname, '../../.env' ) })
 const EleventyFetch = require("@11ty/eleventy-fetch");
 
 
@@ -11,7 +12,7 @@ const spreadsheetUrl = `https://sheets.googleapis.com/v4/spreadsheets/1ChEgFmSQ7
 async function fetchJson(url) {
   console.log(`  >> getching ${url}`)
   const json = await EleventyFetch(url, {
-    duration: '1d',
+    duration: '1m',
     type: 'json'
   })
   return json
