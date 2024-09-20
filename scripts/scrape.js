@@ -1,27 +1,26 @@
 // inspiration: https://github.com/sk1ppi-archived/javascript-nitterio/blob/21698f2a3753813a91282c228d5b47efe69ab9b9/index.js
 
 const cheerio = require('cheerio')
-const dotenv = require('dotenv')
-const moment = require('moment')
-const path = require('path')
-const yargs = require('yargs/yargs')
-const { hideBin } = require('yargs/helpers')
-dotenv.config({ path: path.join(__dirname, '../.env' ) })
+// const htmlparser2 = require('htmlparser2')
+const { DateTime } = require('luxon')
+const configs = require('../configs.js')
+const iso8601 = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+const { URL } = require('node:url')
 
+const normalizeNitterDate = function (nitterDateString) {
+    return DateTime.fromFormat(nitterDateString, "MMM d, yyyy · h:mm a 'UTC'", { zone: 'utc' }).toFormat(iso8601);
+}
 
-if (!process.env.NITTER_USERNAME) throw new Error('NITTER_USERNAME is undefined in environment');
-if (!process.env.NITTER_PASSWORD) throw new Error('NITTER_PASSWORD is undefined in environment');
-if (!process.env.ZEROSHEETS_BEARER_TOKEN) throw new Error('ZEROSHEETS_BEARER_TOKEN is undefined in environment')
-
-
-async function addRowToSpreadsheet(data) {
+const addRowToSpreadsheet = async function addRowToSpreadsheet(data) {
     const url = "https://api.zerosheets.com/v1/sd4"
+
+    console.log('adding row to spreadsheet')
     // for (const i in data.imageUrls) {
     //     console.log(`url:${i}`)
     // }
-    console.log(JSON.stringify(data, null, 2))
+    // console.log(JSON.stringify(data, null, 2))
     const payload = {
-        'Date': moment(data.date).format('MM/DD/YYYY'),
+        'Date': DateTime.fromJSDate(new Date(data.date)).toFormat('MM/DD/YYYY'),
         'VTuber Name': data.vtuberName,
         'VTuber Twitter': data.vtuberTwitterUrl,
         'Image1': data.imageUrls?.at(0) || '',
@@ -33,7 +32,7 @@ async function addRowToSpreadsheet(data) {
     const res = await fetch(url, {
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${process.env.ZEROSHEETS_BEARER_TOKEN}`
+            Authorization: `Bearer ${configs.zerosheetsBearerToken}`
         },
         body: JSON.stringify(payload)
     })
@@ -44,36 +43,127 @@ async function addRowToSpreadsheet(data) {
         throw new Error('response was not OK.')
     }
     body = await res.json()
-    console.log(body)
+    // console.log(body)
+}
+
+/**
+ * 
+ * @param {string} html 
+ * @param {string} url Example: https://nitter.sbtp.xyz/barbariengineer/status/1833573528756539857
+ * @returns 
+ */
+const parseBricktuberData = function parseBricktuberData (html, nitterOrTwitterUrl) {
+    if (!html) throw new Error('parseBricktuberData requires html as first arg');
+    if (!nitterOrTwitterUrl) throw new Error('parseBricktuberData requires url as second argument');
+    nitterOrTwitterUrl = convertToNitterUrl(nitterOrTwitterUrl)
+    const urlPath = new URL(nitterOrTwitterUrl).pathname
+    // console.log(html)
+    // console.log(`parsingBricktuberData using url=${url}`)
+
+    // let vtuberName = ''
+    let vtuberTwitterUrl = ''
+    let twitterImageUrls = []
+    // let nitterImageUrls = []
+    let presentationTweetUrl = ''
+
+    // const $ = cheerio.load(htmlparser2.parseDocument(html, {}))
+    const $ = cheerio.load(html)
+
+    let date = normalizeNitterDate($('p.tweet-published').text())
+    // Find the most recent Monday based on the tweet's date
+    
+    let legoMondayDate = DateTime.fromJSDate(new Date(date)).startOf('week').toFormat(iso8601);
+    
+    // get the tweet body that matches the statusNumber
+    const $tweetBodies = $('div.tweet-body')
+
+    const $matchingTweetBody = $tweetBodies.filter(function() {
+        return $(this).find('span.tweet-date a').attr('href').includes(urlPath)
+    })
+
+    // @todo
+    // * [x] get all the hrefs in the tweet content
+    // * [x] filter out the hashtags, returning @<name> links
+    // * [ ] If there is only one @<name>, vtuberName = `x.com/<name>`
+    // * [ ] If there are multiple names, throw(?)
+    // console.log(`matchingTweetBody=${$matchingTweetBody.text()}`)
+
+    const tweetContentCss = 'div.tweet-content'
+    const $tweetContent = $matchingTweetBody.find(tweetContentCss)
+    console.log($tweetContent.text())
+    const $hrefs = $tweetContent.find('a')
+    $hrefs.each(console.log)
+    
+    
+    const hashtags = $hrefs.filter((i, el) => el.attribs.href.includes('/search?q=')).map((i, el) => $(el).attr('href')).get()
+    const mentions = $hrefs.filter((i, el) => !el.attribs.href.includes('/search?q=')).map((i, el) => $(el).attr('href')).get()
+
+    console.log(mentions)
+    // console.log(hashtags)
+
+    // console.log($hashtags.text())
+    // console.log($hashtags.attr('href'))
+    // console.log($mentions.attr('href'))
+    
+
+
+
+    // Get the vtuber name
+    
+    // const twitterUsernames = $tweetContent.find('a')
+
+    const firstMention = mentions.at(0)
+    const twitterHandle = (mentions.length > 0) ? firstMention.split('/').at(-1) : null
+
+    // Get the vtuber twitter URL
+    vtuberTwitterUrl = (mentions.length > 0) ? convertToTwitterUrl(firstMention) : null
+
+    // Get the image URLS
+    const imagesCss = 'div.attachment.image'
+    const attachmentImages = $matchingTweetBody.find(imagesCss)
+    for (const image of attachmentImages) {
+        const href = $(image).find('a').attr('href')
+        const id = href.split('%2F').at(1).split('.').at(0)
+        twitterImageUrls.push(`https://pbs.twimg.com/media/${id}?format=jpg&name=large`)
+        // nitterImageUrls.push(href)
+    }
+
+    // Get the presentation tweet URL
+    // const url = $matchingTweetBody.find('span.tweet-date a').attr('href')
+    // console.log(idk)
+    presentationTweetUrl = convertToTwitterUrl(nitterOrTwitterUrl)
+    // presentationTweetUrl = tweetUrl.replace('nitter.sbtp.xyz', 'x.com')
+
+    return { date, twitterHandle, vtuberTwitterUrl, twitterImageUrls, presentationTweetUrl, legoMondayDate }
+}
+
+const convertToNitterUrl = (url) => {
+    if (!url) throw new Error('convertToNitterUrl requires string as first arg');
+    return url
+        .replace('x.com', 'nitter.sbtp.xyz')
+        .replace('twitter.com', 'nitter.sbtp.xyz')
+        .replace('#m', '')
+}
+
+const convertToTwitterUrl = (url) => {
+    if (!url) throw new Error('convertToNitterUrl requires string as first arg');
+    return url
+        .replace('nitter.sbtp.xyz', 'x.com')
+        .replace('#m', '')
 }
 
 
-async function getBricktuberData(nitterTweetUrl) {
-    if (!nitterTweetUrl) {
-        throw new Error("nitterTweetUrl is required")
+const getTweetHtml = async function getTweetHtml(tweetUrl) {
+    if (!tweetUrl) {
+        throw new Error("tweetUrl is required")
     }
-
-    // Find the most recent Monday
-    let date = moment().format('YYYY-MM-DD');
-    let recentMonday;
-    do {
-        date = moment(date).subtract(1, 'days');
-        recentMonday = date.format('dddd'); // Format as 'ddd' for 'Mon', 'Tue', etc.
-    } while (recentMonday !== 'Monday');
-    // console.log(`most recent monday was ${date}`)
-
-    let vtuberName = ''
-    let vtuberTwitterUrl = ''
-    let imageUrls = []
-    let presentationTweetUrl = ''
+    const nitterUrl = convertToNitterUrl(tweetUrl)
 
 
-
-
-    const res = await fetch(nitterTweetUrl, {
+    const res = await fetch(nitterUrl, {
         method: "GET",
         headers: {
-            'Authorization': `Basic ${Buffer.from(process.env.NITTER_USERNAME + ":" + process.env.NITTER_PASSWORD).toString('base64')}`,
+            'Authorization': `Basic ${Buffer.from(configs.nitterUsername + ":" + configs.nitterPassword).toString('base64')}`,
             "Accept": "text/html",
             "Accept-Language": "en-US,en;q=0.9",
             "Cache-Control": "no-cache",
@@ -87,56 +177,15 @@ async function getBricktuberData(nitterTweetUrl) {
         throw new Error('response was not OK')
     }
     const body = await res.text()
-    const $ = cheerio.load(body)
-    
-    // Get the vtuber name
-    const tweetContentCss = 'div.tweet-content'
-    const tweetContent = $(tweetContentCss)
-    const twitterUsernames = tweetContent.find('a')
-    vtuberName = twitterUsernames.first().attr('title')
-
-    // Get the vtuber twitter URL
-    vtuberTwitterUrl = `https://x.com${twitterUsernames.first().attr('href')}`
-
-    // Get the image URLS
-    const imagesCss = 'div.attachment.image'
-    const attachmentImages = $(imagesCss)
-    for (const image of attachmentImages) {
-        const href = $(image).find('a').attr('href')
-        const id = href.split('%2F').at(1).split('.').at(0)
-        imageUrls.push(`https://pbs.twimg.com/media/${id}?format=jpg&name=large`)
-    }
-
-    // Get the presentation tweet URL
-    presentationTweetUrl = nitterTweetUrl.replace('nitter.sbtp.xyz', 'x.com')
-
-
-    return { 
-        date, vtuberName, vtuberTwitterUrl, imageUrls, presentationTweetUrl
-    }
+    return body
 }
 
 
 
-
-async function main() {
-    const argv = yargs(hideBin(process.argv)).argv
-    // console.log(argv)
-    // process.exit(3)
-    const nitterTweetUrl = argv._?.at(0)
-    if (!nitterTweetUrl) throw new Error('nitterTweetUrl must be the first argument. example: `node ./scripts/scrape.js https://nitter.sbtp.xyz/barbariengineer/status/1806094563922022538');
-    const data = await getBricktuberData(nitterTweetUrl)
-    console.log(`  > Data gathering complete.`)
-    console.log(`  > date:                 ${data.date}`)
-    console.log(`  > vtuberName:           ${data.vtuberName}`)
-    console.log(`  > vtuberTwitterUrl:     ${data.vtuberTwitterUrl}`)
-    console.log(`  > imageUrls:            ${data.imageUrls.join(', ')}`)
-    console.log(`  > presentationTweetUrl: ${data.presentationTweetUrl}`)
-
-    await addRowToSpreadsheet(data)
-    
+module.exports = {
+    getTweetHtml,
+    parseBricktuberData,
+    addRowToSpreadsheet,
+    normalizeNitterDate,
 }
-
-
-main()
 
