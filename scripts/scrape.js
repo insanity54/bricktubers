@@ -6,6 +6,8 @@ const { DateTime } = require('luxon')
 const configs = require('../configs.js')
 const iso8601 = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
 const { URL } = require('node:url')
+const jsdom = require("jsdom");
+const { JSDOM } = jsdom;
 
 const normalizeNitterDate = function (nitterDateString) {
     return DateTime.fromFormat(nitterDateString, "MMM d, yyyy · h:mm a 'UTC'", { zone: 'utc' }).toFormat(iso8601);
@@ -20,13 +22,13 @@ const addRowToSpreadsheet = async function addRowToSpreadsheet(data) {
     // }
     // console.log(JSON.stringify(data, null, 2))
     const payload = {
-        'Date': DateTime.fromJSDate(new Date(data.date)).toFormat('MM/DD/YYYY'),
+        'Date': DateTime.fromJSDate(new Date(data.date)).toFormat('MM/dd/yyyy'),
         'VTuber Name': data.vtuberName,
         'VTuber Twitter': data.vtuberTwitterUrl,
-        'Image1': data.imageUrls?.at(0) || '',
-        'Image2': data.imageUrls?.at(1) || '',
-        'Image3': data.imageUrls?.at(2) || '',
-        'Image4': data.imageUrls?.at(3) || '',
+        'Image1': data.twitterImageUrls?.at(0) || '',
+        'Image2': data.twitterImageUrls?.at(1) || '',
+        'Image3': data.twitterImageUrls?.at(2) || '',
+        'Image4': data.twitterImageUrls?.at(3) || '',
         'Presentation Tweet': data.presentationTweetUrl
     }
     const res = await fetch(url, {
@@ -63,11 +65,14 @@ const parseBricktuberData = function parseBricktuberData (html, nitterOrTwitterU
     // let vtuberName = ''
     let vtuberTwitterUrl = ''
     let twitterImageUrls = []
+    let twitterDisplayName = ''
     // let nitterImageUrls = []
     let presentationTweetUrl = ''
 
     // const $ = cheerio.load(htmlparser2.parseDocument(html, {}))
     const $ = cheerio.load(html)
+    // experimental using jsdom
+    const dom = new JSDOM(html)
 
     let date = normalizeNitterDate($('p.tweet-published').text())
     // Find the most recent Monday based on the tweet's date
@@ -90,15 +95,15 @@ const parseBricktuberData = function parseBricktuberData (html, nitterOrTwitterU
 
     const tweetContentCss = 'div.tweet-content'
     const $tweetContent = $matchingTweetBody.find(tweetContentCss)
-    console.log($tweetContent.text())
+    // console.log($tweetContent.text())
     const $hrefs = $tweetContent.find('a')
-    $hrefs.each(console.log)
+    // $hrefs.each(console.log)
     
     
     const hashtags = $hrefs.filter((i, el) => el.attribs.href.includes('/search?q=')).map((i, el) => $(el).attr('href')).get()
     const mentions = $hrefs.filter((i, el) => !el.attribs.href.includes('/search?q=')).map((i, el) => $(el).attr('href')).get()
 
-    console.log(mentions)
+    // console.log(mentions)
     // console.log(hashtags)
 
     // console.log($hashtags.text())
@@ -114,9 +119,26 @@ const parseBricktuberData = function parseBricktuberData (html, nitterOrTwitterU
 
     const firstMention = mentions.at(0)
     const twitterHandle = (mentions.length > 0) ? firstMention.split('/').at(-1) : null
+    const fullUrlTwitterHandle = `https://x.com/${twitterHandle}`
 
     // Get the vtuber twitter URL
-    vtuberTwitterUrl = (mentions.length > 0) ? convertToTwitterUrl(firstMention) : null
+    vtuberTwitterUrl = (mentions.length > 0) ? convertToTwitterUrl(fullUrlTwitterHandle) : null
+
+    // Get the vtuber twitterDisplayName
+    // console.log('>> firstMention as follows')
+    // console.log(firstMention)
+
+    // greets https://www.twilio.com/en-us/blog/web-scraping-and-parsing-html-in-node-js-with-jsdom
+    const isTwitterProfileUrl = (link) => {
+        // Return false if there is no href attribute.
+        if(typeof link.href === 'undefined') { return false }
+      
+        return (link.href.split('/').at(-1) === twitterHandle)
+      };
+    const nodeList = [...dom.window.document.querySelectorAll('a')];
+    twitterDisplayName = nodeList.find(isTwitterProfileUrl)?.title
+
+
 
     // Get the image URLS
     const imagesCss = 'div.attachment.image'
@@ -134,7 +156,7 @@ const parseBricktuberData = function parseBricktuberData (html, nitterOrTwitterU
     presentationTweetUrl = convertToTwitterUrl(nitterOrTwitterUrl)
     // presentationTweetUrl = tweetUrl.replace('nitter.sbtp.xyz', 'x.com')
 
-    return { date, twitterHandle, vtuberTwitterUrl, twitterImageUrls, presentationTweetUrl, legoMondayDate }
+    return { date, twitterHandle, twitterDisplayName, twitterImageUrls, vtuberTwitterUrl, presentationTweetUrl, legoMondayDate }
 }
 
 const convertToNitterUrl = (url) => {
@@ -187,5 +209,7 @@ module.exports = {
     parseBricktuberData,
     addRowToSpreadsheet,
     normalizeNitterDate,
+    convertToTwitterUrl,
+    convertToNitterUrl,
 }
 
