@@ -16,7 +16,7 @@ const spreadsheetUrl = `https://sheets.googleapis.com/v4/spreadsheets/1ChEgFmSQ7
 
 function unmarshallVtuberSpreadsheetData(json) {
   let data = []
-  console.log(json.values.find((d) => d[2].includes('Mio')))
+  // console.log(json.values.find((d) => d[2].includes('Mio')))
   json.values.slice(1).forEach((datum, i) => {
     let bt = {}
     bt.id = i
@@ -34,7 +34,7 @@ function unmarshallVtuberSpreadsheetData(json) {
     data.push(bt)
   })
 
-  console.log(data.map((bt) => bt.vtuberSlug).join(','))
+  // console.log(data.map((bt) => bt.vtuberSlug).join(','))
   
   return data
 }
