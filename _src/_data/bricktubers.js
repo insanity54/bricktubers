@@ -16,14 +16,14 @@ const spreadsheetUrl = `https://sheets.googleapis.com/v4/spreadsheets/1ChEgFmSQ7
 
 function unmarshallVtuberSpreadsheetData(json) {
   let data = []
-  // console.log(json.values)
+  console.log(json.values.find((d) => d[2].includes('Mio')))
   json.values.slice(1).forEach((datum, i) => {
     let bt = {}
     bt.id = i
     bt.bebNumber = datum[0]
     bt.date = datum[1]
     bt.vtuberName = datum[2]
-    bt.vtuberSlug = !!datum[3] ? slugify(datum[3]?.split('/').at(-1)) : 'bricktuber-'+i
+    bt.vtuberSlug = (datum[3] === 'n/a' || !datum[3]) ? 'bricktuber-'+i : slugify(datum[3].split('/').at(-1))
     bt.vtuberTwitter = datum[3]
     bt.image1 = datum[4]
     bt.image2 = datum[5]
@@ -33,6 +33,8 @@ function unmarshallVtuberSpreadsheetData(json) {
     bt.instructions = datum[9]
     data.push(bt)
   })
+
+  console.log(data.map((bt) => bt.vtuberSlug).join(','))
   
   return data
 }
