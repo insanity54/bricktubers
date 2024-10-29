@@ -2,11 +2,12 @@
 
 <nav class="navbar" role="navigation">
 <div class="navbar-brand">
-<a class="navbar-item" href="{{ "/" | url }}">
+<a id="top" class="navbar-item" href="{{ "/" | url }}">
   {% getFigureHtml './_src/img/beb.png', "Beb", [24] %}
 </a>
 </div>
 {%- for nav in navPages %}
   <a class="navbar-item" href="{{ nav.url }}">{{ nav.title }}</a>
 {%- endfor %}
+
 </nav>

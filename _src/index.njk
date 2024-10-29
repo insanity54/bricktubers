@@ -5,6 +5,59 @@ eleventyNavigation:
   order: 1
 ---
 {% include "nav.njk" %}
+
+<script src="/js/elasticlunr.min.js"></script>
+<script>
+  (function (window, document) {
+  "use strict";
+
+  const search = (e) => {
+    const results = window.searchIndex.search(e.target.value, {
+      bool: "OR",
+      expand: true,
+    });
+
+    const resEl = document.getElementById("searchResults");
+    const noResultsEl = document.getElementById("noResultsFound");
+
+    resEl.innerHTML = "";
+    if (results) {
+      noResultsEl.style.display = "none";
+      results.map((r) => {
+
+        console.log(r.doc)
+
+        const { date, name, twitter, id, slug } = r.doc;
+        const el = document.createElement("li");
+        resEl.appendChild(el);
+
+        const h3 = document.createElement("h3");
+        el.appendChild(h3);
+
+        const a = document.createElement("a");
+        a.setAttribute("href", `#${slug}`);
+        a.textContent = name;
+        h3.appendChild(a);
+
+        const p = document.createElement("p");
+        p.textContent = `${date} ${name}`;
+        el.appendChild(p);
+      });
+    } else {
+      noResultsEl.style.display = "block";
+    }
+  };
+
+  fetch("/search-index.json").then((response) =>
+    response.json().then((rawIndex) => {
+      window.searchIndex = elasticlunr.Index.load(rawIndex);
+      document.getElementById("searchField").addEventListener("input", search);
+    })
+  );
+})(window, document);
+</script>
+
+
 <section>
   <div class="hero-body">
     <h1 class="title">Beb's Builds</h1>
@@ -20,7 +73,19 @@ eleventyNavigation:
 
     <p>An unofficial fansite for <a target="_blank" href="https://twitter.com/barbariengineer">Beb</a> the Barbarian Engineer VTuber who streams on <a target="_blank" href="https://twitch.tv/bebthebarbariengineer">Twitch</a>.</p>
     <p>Since 2021, he has created many characters and vtubers out of LEGO.</p>
-    <p class="mt-5"><i>This is an exhaustive list of all <span class="count">{{ bricktubers.values.length-1 }}</span> Bricktubers Beb has created and documented.</p>
+    <p class="mt-5"><i>This is an exhaustive list of all <span class="count">{{ bricktubers.length-1 }}</span> Bricktubers Beb has created and documented.</p>
+
+    
+    <div class="field mt-5">
+      <label class="label" for="searchField">Search</label>
+      <input class="input" type="search" placeholder="Search..." id="searchField" />
+    </div>
+    <div class="content">
+    <ol id="searchResults"></ol>
+    </div>
+    <div id="noResultsFound" style="display: none">
+      <p>No results found.</p>
+    </div>
 
   </div>
 </section>
@@ -29,17 +94,19 @@ eleventyNavigation:
 <section>
 
     <div class="columns is-multiline is-mobile">
-      {% for bricktuber in bricktubers.values.slice(1) |reverse %}
-        {% set bebNumber = bricktuber[0] %}
-        {% set date = bricktuber[1] %}
-        {% set vtuberName = bricktuber[2] %}
-        {% set vtuberTwitter = bricktuber[3] %}
-        {% set image1 = bricktuber[4] %}
-        {% set image2 = bricktuber[5] %}
-        {% set image3 = bricktuber[6] %}
-        {% set image4 = bricktuber[7] %}
-        {% set presentationTweet = bricktuber[8] %}
-        {% set instructions = bricktuber[9] %}
+      {% for bricktuber in bricktubers | reverse %}
+        {% set bebNumber = bricktuber.bebNumber %}
+        {% set date = bricktuber.date %}
+        {% set vtuberName = bricktuber.vtuberName %}
+        {% set vtuberSlug = bricktuber.vtuberSlug %}
+        {% set vtuberId = bricktuber.id %}
+        {% set vtuberTwitter = bricktuber.vtuberTwitter %}
+        {% set image1 = bricktuber.image1 %}
+        {% set image2 = bricktuber.image2 %}
+        {% set image3 = bricktuber.image3 %}
+        {% set image4 = bricktuber.image4 %}
+        {% set presentationTweet = bricktuber.presentationTweet %}
+        {% set instructions = bricktuber.instructions %}
 {# 
         <p>debug section</p>
         <p>{{date}}</p>
@@ -50,13 +117,15 @@ eleventyNavigation:
         {% if date and vtuberName and vtuberTwitter and image1 %}
 
           <div class="column is-half-mobile is-one-third-tablet is-one-fifth-desktop">
-            <div class="card">
-              <div class="card-image">
-                {% getFigureHtml image1, vtuberName %}
-              </div>
+            <div data-pagefind-body class="card">
+              <a style="cursor: default;" id="{{ vtuberSlug }}">
+                <div class="card-image">
+                  {% getFigureHtml image1, vtuberName %}
+                </div>
+              </a>
               <div class="card-content">
                 <div class="media-content">
-                  <p class="title is-4">{{ vtuberName }}</p>
+                  <h1 class="title is-4">{{ vtuberName }}</h1>
                   
                   {% if vtuberTwitter and vtuberTwitter !== 'n/a' %}
                     <p class="subtitle is-6">
@@ -109,3 +178,4 @@ eleventyNavigation:
     </div>
 </section>
 
+{% include "scroll-to-top.njk" %}

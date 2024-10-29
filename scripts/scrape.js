@@ -23,7 +23,7 @@ const addRowToSpreadsheet = async function addRowToSpreadsheet(data) {
     // console.log(JSON.stringify(data, null, 2))
     const payload = {
         'Date': DateTime.fromJSDate(new Date(data.date)).toFormat('MM/dd/yyyy'),
-        'VTuber Name': data.vtuberName,
+        'VTuber Name': data.twitterDisplayName,
         'VTuber Twitter': data.vtuberTwitterUrl,
         'Image1': data.twitterImageUrls?.at(0) || '',
         'Image2': data.twitterImageUrls?.at(1) || '',

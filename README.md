@@ -2,7 +2,6 @@
 
 ## Unofficial fan site by [CJ_Clippy](https://twitter.com/cj_clippy)
 
-
 ## CLI tool usage
 
     ./bricktubers.js scrape https://x.com/barbariengineer/status/1831738467371643232
@@ -18,3 +17,7 @@ https://github.com/libvips/libvips/issues/3718#issuecomment-1771494570
 ### 2024-09-11
 
 Added `bricktubers.js` CLI interface.
+
+### 2024-10-28
+
+Added search and scroll to top button

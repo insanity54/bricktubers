@@ -1,6 +1,6 @@
 const Image = require("@11ty/eleventy-img");
 const eleventyNavigationPlugin = require("@11ty/eleventy-navigation");
-
+const searchFilter = require("./_src/_filters/searchFilter");
 
 async function figureHtml(src, alt, widths) {
   let stats = await Image(src, {
@@ -25,6 +25,11 @@ async function figureHtml(src, alt, widths) {
 
 
 module.exports = function (eleventyConfig) {
+
+  // Looking for JSON.stringify? in eleventy/nunjucks land, we use `example | dump | safe` instead.
+
+  eleventyConfig.addFilter("search", searchFilter);
+  eleventyConfig.addGlobalData()
   // Values can be static:
   eleventyConfig.addGlobalData("myStatic", "static");
   // functions:
@@ -47,14 +52,6 @@ module.exports = function (eleventyConfig) {
   );
 
 
-  eleventyConfig.addNunjucksShortcode("bricktuber", function(name, twitter) {
-    return `
-      <div class="bricktuber">
-        <div class="bricktuber_name">${name}</div>
-        <div class="bricktuber_twitter">${twitter}</div>
-      </div>
-    `
-  });
 
 
   eleventyConfig.addNunjucksFilter("bname", function(value) {
@@ -67,7 +64,6 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addNunjucksAsyncShortcode("getFigureHtml", figureHtml);
   eleventyConfig.addPlugin(eleventyNavigationPlugin);
   eleventyConfig.addPassthroughCopy({'./_src/_includes/js': '/js'})
-
 
   return {
     dir: {
