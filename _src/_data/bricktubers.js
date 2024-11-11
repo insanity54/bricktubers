@@ -23,7 +23,7 @@ function unmarshallVtuberSpreadsheetData(json) {
     bt.bebNumber = datum[0]
     bt.date = datum[1]
     bt.vtuberName = datum[2]
-    bt.vtuberSlug = (datum[3] === 'n/a' || !datum[3]) ? 'bricktuber-'+i : slugify(datum[3].split('/').at(-1))
+    bt.vtuberSlug = slugify('bricktuber-'+i)
     bt.vtuberTwitter = datum[3]
     bt.image1 = datum[4]
     bt.image2 = datum[5]
