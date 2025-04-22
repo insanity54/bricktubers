@@ -8,6 +8,10 @@
 
 ## changelog
 
+### 2025-04-21
+
+Automated tweet scraping, switched ftp to sftp
+
 ### 2023-11-20 
 
 removed avif to deal with build error `heif_writer callback returned a null error text`

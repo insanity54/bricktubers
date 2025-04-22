@@ -1,9 +1,0 @@
----
-permalink: '/js/colors.json'
----
-{
-  "colors": [
-    {% for color in scranclan.colors %}{{ color | dump | safe }}{% if not loop.last %},{% endif %}
-    {% endfor %}
-  ]
-}

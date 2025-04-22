@@ -38,9 +38,12 @@ echo "Proceed with the FTP connection and synchronization"
 lftp -u "$BUNNY_FTP_USERNAME,$BUNNY_FTP_PASSWORD" "$BUNNY_FTP_HOSTNAME" << EOF
 set ftp:sync-mode false
 set ftp:use-mdtm off
-mirror --reverse --parallel=10 --continue ./_site/ ~
+mirror --reverse --parallel=10 --continue ./_site/ /
 exit
 EOF
+
+
+
 
 
 echo "purge CDN cache so users see new updates"
