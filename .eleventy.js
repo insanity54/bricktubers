@@ -54,16 +54,16 @@ module.exports = function (eleventyConfig) {
 
 
 
-  eleventyConfig.addNunjucksFilter("bname", function(value) {
-    if (typeof value === 'undefined' || value === 'n/a') return '';
+  eleventyConfig.addNunjucksFilter("bname", function (value) {
+    if (typeof value === 'undefined' || value === 'n/a') return 'n/a';
     if (!value.includes('/')) return '';
     const parts = value.split('/')
-    return parts[parts.length-1]
+    return parts[parts.length - 1]
   });
 
   eleventyConfig.addNunjucksAsyncShortcode("getFigureHtml", figureHtml);
   eleventyConfig.addPlugin(eleventyNavigationPlugin);
-  eleventyConfig.addPassthroughCopy({'./_src/_includes/js': '/js'})
+  eleventyConfig.addPassthroughCopy({ './_src/_includes/js': '/js' })
 
   return {
     dir: {

@@ -25,3 +25,11 @@ Added `bricktubers.js` CLI interface.
 ### 2024-10-28
 
 Added search and scroll to top button
+
+### 2025-10-13
+
+updated twitch.tv/bebthebarbariengineer to twitch.tv/bebvt
+
+### 2025-12-08
+
+added bluesky row

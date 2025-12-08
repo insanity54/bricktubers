@@ -1,7 +1,7 @@
 
 
 const path = require('path')
-require('dotenv').config({ path: path.join(__dirname, '../../.env' ) })
+require('dotenv').config({ path: path.join(__dirname, '../../.env') })
 const EleventyFetch = require("@11ty/eleventy-fetch");
 const slugify = require('slugify', {
   replacement: '-',
@@ -23,7 +23,7 @@ function unmarshallVtuberSpreadsheetData(json) {
     bt.bebNumber = datum[0]
     bt.date = datum[1]
     bt.vtuberName = datum[2]
-    bt.vtuberSlug = slugify('bricktuber-'+i)
+    bt.vtuberSlug = slugify('bricktuber-' + i)
     bt.vtuberTwitter = datum[3]
     bt.image1 = datum[4]
     bt.image2 = datum[5]
@@ -31,16 +31,18 @@ function unmarshallVtuberSpreadsheetData(json) {
     bt.image4 = datum[7]
     bt.presentationTweet = datum[8]
     bt.instructions = datum[9]
+    bt.note = datum[10]
+    bt.vtuberBluesky = datum[11]
     data.push(bt)
   })
 
-  // console.log(data.map((bt) => bt.vtuberSlug).join(','))
-  
+  console.log(data.map((bt) => `${bt.vtuberSlug}:${bt.vtuberName}`).join(','))
+
   return data
 }
 
 async function fetchBricktuberData(url) {
-  // console.log(`  >> getching ${url}`)
+  console.log(`  >> getching ${url}`)
   const json = await EleventyFetch(url, {
     duration: '1m',
     type: 'json'
@@ -48,7 +50,7 @@ async function fetchBricktuberData(url) {
   return unmarshallVtuberSpreadsheetData(json)
 }
 
-module.exports = async function() {
+module.exports = async function () {
   return fetchBricktuberData(spreadsheetUrl)
 };
 

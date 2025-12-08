@@ -29,7 +29,8 @@ const addRowToSpreadsheet = async function addRowToSpreadsheet(data) {
         'Image2': data.twitterImageUrls?.at(1) || '',
         'Image3': data.twitterImageUrls?.at(2) || '',
         'Image4': data.twitterImageUrls?.at(3) || '',
-        'Presentation Tweet': data.presentationTweetUrl
+        'Presentation Tweet': data.presentationTweetUrl,
+        'Note': data.vtuberNote
     }
     const res = await fetch(url, {
         method: 'POST',
@@ -54,7 +55,7 @@ const addRowToSpreadsheet = async function addRowToSpreadsheet(data) {
  * @param {string} url Example: https://nitter.sbtp.xyz/barbariengineer/status/1833573528756539857
  * @returns 
  */
-const parseBricktuberData = function parseBricktuberData (html, nitterOrTwitterUrl) {
+const parseBricktuberData = function parseBricktuberData(html, nitterOrTwitterUrl) {
     if (!html) throw new Error('parseBricktuberData requires html as first arg');
     if (!nitterOrTwitterUrl) throw new Error('parseBricktuberData requires url as second argument');
     nitterOrTwitterUrl = convertToNitterUrl(nitterOrTwitterUrl)
@@ -68,6 +69,7 @@ const parseBricktuberData = function parseBricktuberData (html, nitterOrTwitterU
     let twitterDisplayName = ''
     // let nitterImageUrls = []
     let presentationTweetUrl = ''
+    let vtuberNote = ''
 
     // const $ = cheerio.load(htmlparser2.parseDocument(html, {}))
     const $ = cheerio.load(html)
@@ -76,13 +78,13 @@ const parseBricktuberData = function parseBricktuberData (html, nitterOrTwitterU
 
     let date = normalizeNitterDate($('p.tweet-published').text())
     // Find the most recent Monday based on the tweet's date
-    
+
     let legoMondayDate = DateTime.fromJSDate(new Date(date)).startOf('week').toFormat(iso8601);
-    
+
     // get the tweet body that matches the statusNumber
     const $tweetBodies = $('div.tweet-body')
 
-    const $matchingTweetBody = $tweetBodies.filter(function() {
+    const $matchingTweetBody = $tweetBodies.filter(function () {
         return $(this).find('span.tweet-date a').attr('href').includes(urlPath)
     })
 
@@ -98,8 +100,8 @@ const parseBricktuberData = function parseBricktuberData (html, nitterOrTwitterU
     // console.log($tweetContent.text())
     const $hrefs = $tweetContent.find('a')
     // $hrefs.each(console.log)
-    
-    
+
+
     const hashtags = $hrefs.filter((i, el) => el.attribs.href.includes('/search?q=')).map((i, el) => $(el).attr('href')).get()
     const mentions = $hrefs.filter((i, el) => !el.attribs.href.includes('/search?q=')).map((i, el) => $(el).attr('href')).get()
 
@@ -109,12 +111,12 @@ const parseBricktuberData = function parseBricktuberData (html, nitterOrTwitterU
     // console.log($hashtags.text())
     // console.log($hashtags.attr('href'))
     // console.log($mentions.attr('href'))
-    
+
 
 
 
     // Get the vtuber name
-    
+
     // const twitterUsernames = $tweetContent.find('a')
 
     const firstMention = mentions.at(0)
@@ -131,10 +133,10 @@ const parseBricktuberData = function parseBricktuberData (html, nitterOrTwitterU
     // greets https://www.twilio.com/en-us/blog/web-scraping-and-parsing-html-in-node-js-with-jsdom
     const isTwitterProfileUrl = (link) => {
         // Return false if there is no href attribute.
-        if(typeof link.href === 'undefined') { return false }
-      
+        if (typeof link.href === 'undefined') { return false }
+
         return (link.href.split('/').at(-1) === twitterHandle)
-      };
+    };
     const nodeList = [...dom.window.document.querySelectorAll('a')];
     twitterDisplayName = nodeList.find(isTwitterProfileUrl)?.title
 
